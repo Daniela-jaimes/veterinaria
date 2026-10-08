@@ -1,0 +1,158 @@
+erDiagram
+    %% ==========================================
+    %% RELACIONES (notación pata de gallo)
+    %% ==========================================
+    Veterinarian |o--o| App_user : "tiene acceso"
+    Speciality ||--o{ Veterinarian : "clasifica"
+    Customer ||--o{ Pet : "es dueño de"
+    Breed ||--o{ Pet : "define raza"
+    Pet ||--o{ Pet_allergy : "tiene"
+    Pet ||--o| Medical_record : "posee"
+    Pet ||--o{ Appointment : "agenda"
+    Veterinarian ||--o{ Appointment : "atiende"
+    Medical_record ||--o{ Consultation : "registra"
+    Appointment |o--o| Consultation : "origina"
+    Veterinarian ||--o{ Consultation : "realiza"
+    Consultation ||--o{ Treatment : "prescribe"
+    Medication ||--o{ Treatment : "se usa en"
+    Consultation ||--o{ Vaccination : "aplica"
+    Vaccine ||--o{ Vaccination : "se aplica en"
+
+    %% ==========================================
+    %% ENTIDADES
+    %% ==========================================
+    App_user {
+        int user_id PK
+        string username UK
+        string email UK
+        string password_hash
+        user_role role "admin | veterinarian | receptionist"
+        int vet_id FK, UK
+        boolean is_active
+        timestamp last_login
+        timestamp created_at
+    }
+
+    Customer {
+        int customer_id PK
+        string first_name
+        string last_name
+        string phone
+        string email UK
+        string address
+        string emergency_contact
+        boolean is_active
+        timestamp created_at
+    }
+
+    Speciality {
+        int speciality_id PK
+        string name UK
+    }
+
+    Veterinarian {
+        int vet_id PK
+        int speciality_id FK
+        string first_name
+        string last_name
+        string license_number UK
+        string phone
+        string email UK
+        boolean is_active
+    }
+
+    Breed {
+        int breed_id PK
+        pet_species species "UK compuesto con name"
+        string name "UK compuesto con species"
+    }
+
+    Pet {
+        int pet_id PK
+        int customer_id FK
+        int breed_id FK
+        string name
+        date birth_date
+        pet_sex sex "male | female | unknown"
+        string microchip_number UK
+        boolean is_neutered
+        boolean is_active
+    }
+
+    Pet_allergy {
+        int allergy_id PK
+        int pet_id FK
+        string description
+    }
+
+    Medical_record {
+        int medical_record_id PK
+        int pet_id FK, UK
+        date opened_on
+        text general_notes
+    }
+
+    Appointment {
+        int appointment_id PK
+        int pet_id FK
+        int vet_id FK
+        timestamp scheduled_at
+        int duration_minutes "CHECK > 0"
+        string reason
+        appointment_status status "scheduled | in_consultation | completed | cancelled | no_show"
+        text notes
+    }
+
+    Consultation {
+        int consultation_id PK
+        int medical_record_id FK
+        int appointment_id FK, UK
+        int vet_id FK
+        consultation_type consultation_type "checkup | vaccination | emergency | surgery | follow_up | other"
+        timestamp consultation_date
+        decimal weight_kg
+        decimal temperature_c
+        int heart_rate
+        int respiratory_rate
+        string mucosal_state
+        text anamnesis
+        text diagnosis
+        string prognosis
+        text treatment_plan
+        date next_checkup
+        text notes
+    }
+
+    Medication {
+        int medication_id PK
+        string name UK
+        string description
+    }
+
+    Treatment {
+        int treatment_id PK
+        int consultation_id FK
+        int medication_id FK
+        string dosage
+        string frequency
+        date start_date
+        date end_date
+        text instructions
+        treatment_status status "active | completed | suspended"
+    }
+
+    Vaccine {
+        int vaccine_id PK
+        string name "UK compuesto con manufacturer"
+        string manufacturer "UK compuesto con name"
+    }
+
+    Vaccination {
+        int vaccination_id PK
+        int consultation_id FK
+        int vaccine_id FK
+        string batch_number
+        date date_given
+        date next_due_date
+        text notes
+    }
