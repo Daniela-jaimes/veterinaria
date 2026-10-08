@@ -1,0 +1,34 @@
+# =========================
+# Python / FastAPI
+# =========================
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Variables de entorno
+.env
+.env.*
+!.env.example
+
+# =========================
+# Angular / Node
+# =========================
+node_modules/
+.angular/
+dist/
+.cache/
+
+# =========================
+# IDE
+# =========================
+.vscode/
+.idea/
+
+# =========================
+# Sistema operativo
+# =========================
+.DS_Store
+Thumbs.db

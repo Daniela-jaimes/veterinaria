@@ -1,0 +1,248 @@
+// ==========================================
+// SISTEMA DE GESTIÓN DE CLÍNICA VETERINARIA (v3 - Organizado)
+// ==========================================
+
+Enum appointment_status {
+  scheduled
+  in_consultation
+  completed
+  cancelled
+  no_show
+}
+
+Enum treatment_status {
+  active
+  completed
+  suspended
+}
+
+Enum pet_sex {
+  male
+  female
+  unknown
+}
+
+Enum pet_species {
+  dog
+  cat
+  bird
+  rabbit
+  reptile
+  rodent
+  other
+}
+
+Enum consultation_type {
+  checkup
+  vaccination
+  emergency
+  surgery
+  follow_up
+  other
+}
+
+Enum user_role {
+  admin
+  veterinarian
+  receptionist
+}
+
+// ------------------------------------------
+// TABLAS
+// ------------------------------------------
+Table App_user {
+  user_id integer [primary key, increment]
+  username varchar(50) [unique, not null]
+  email varchar(100) [unique, not null]
+  password_hash varchar(255) [not null]
+  role user_role [not null, default: 'receptionist']
+  vet_id integer [unique]
+  is_active boolean [not null, default: true]
+  last_login timestamp
+  created_at timestamp [not null, default: `now()`]
+}
+
+Table Customer {
+  customer_id integer [primary key, increment]
+  first_name varchar(50) [not null]
+  last_name varchar(50) [not null]
+  phone varchar(20)
+  email varchar(100) [unique]
+  address varchar(200)
+  emergency_contact varchar(20)
+  is_active boolean [not null, default: true]
+  created_at timestamp [not null, default: `now()`]
+}
+
+Table Speciality {
+  speciality_id integer [primary key, increment]
+  name varchar(100) [unique, not null]
+}
+
+Table Veterinarian {
+  vet_id integer [primary key, increment]
+  speciality_id integer [not null]
+  first_name varchar(50) [not null]
+  last_name varchar(50) [not null]
+  license_number varchar(50) [unique, not null]
+  phone varchar(20)
+  email varchar(100) [unique]
+  is_active boolean [not null, default: true]
+}
+
+Table Breed {
+  breed_id integer [primary key, increment]
+  species pet_species [not null]
+  name varchar(50) [not null]
+
+  indexes {
+    (species, name) [unique]
+  }
+}
+
+Table Pet {
+  pet_id integer [primary key, increment]
+  customer_id integer [not null]
+  breed_id integer [not null]
+  name varchar(50) [not null]
+  birth_date date
+  sex pet_sex [not null, default: 'unknown']
+  microchip_number varchar(20) [unique]
+  is_neutered boolean [not null, default: false]
+  is_active boolean [not null, default: true]
+}
+
+Table Pet_allergy {
+  allergy_id integer [primary key, increment]
+  pet_id integer [not null]
+  description varchar(150) [not null]
+}
+
+Table Medical_record {
+  medical_record_id integer [primary key, increment]
+  pet_id integer [unique, not null]
+  opened_on date [not null]
+  general_notes text
+}
+
+Table Appointment {
+  appointment_id integer [primary key, increment]
+  pet_id integer [not null]
+  vet_id integer [not null]
+  scheduled_at timestamp [not null]
+  duration_minutes integer [not null, default: 30, check: `duration_minutes > 0`]
+  reason varchar(255) [not null]
+  status appointment_status [not null, default: 'scheduled']
+  notes text
+
+  indexes {
+    (vet_id, scheduled_at)
+  }
+}
+
+Table Consultation {
+  consultation_id integer [primary key, increment]
+  medical_record_id integer [not null]
+  appointment_id integer [unique]
+  vet_id integer [not null]
+  consultation_type consultation_type [not null]
+  consultation_date timestamp [not null, default: `now()`]
+  weight_kg decimal(5, 2) [check: `weight_kg > 0`]
+  temperature_c decimal(4, 1) [check: `temperature_c > 0`]
+  heart_rate integer [check: `heart_rate >= 0`]
+  respiratory_rate integer [check: `respiratory_rate >= 0`]
+  mucosal_state varchar(50)
+  anamnesis text
+  diagnosis text
+  prognosis varchar(50)
+  treatment_plan text
+  next_checkup date
+  notes text
+}
+
+Table Medication {
+  medication_id integer [primary key, increment]
+  name varchar(100) [unique, not null]
+  description varchar(255)
+}
+
+Table Treatment {
+  treatment_id integer [primary key, increment]
+  consultation_id integer [not null]
+  medication_id integer [not null]
+  dosage varchar(50) [not null]
+  frequency varchar(50) [not null]
+  start_date date [not null]
+  end_date date
+  instructions text
+  status treatment_status [not null, default: 'active']
+}
+
+Table Vaccine {
+  vaccine_id integer [primary key, increment]
+  name varchar(100) [not null]
+  manufacturer varchar(100)
+
+  indexes {
+    (name, manufacturer) [unique]
+  }
+}
+
+Table Vaccination {
+  vaccination_id integer [primary key, increment]
+  consultation_id integer [not null]
+  vaccine_id integer [not null]
+  batch_number varchar(50)
+  date_given date [not null]
+  next_due_date date
+  notes text
+}
+
+// ------------------------------------------
+// GRUPOS VISUALES (Para ordenar el diagrama)
+// ------------------------------------------
+TableGroup Seguridad_Personal {
+  App_user
+  Veterinarian
+  Speciality
+}
+
+TableGroup Clientes_Mascotas {
+  Customer
+  Pet
+  Breed
+  Pet_allergy
+}
+
+TableGroup Expediente_Consultas {
+  Medical_record
+  Appointment
+  Consultation
+}
+
+TableGroup Tratamientos_Vacunas {
+  Treatment
+  Medication
+  Vaccination
+  Vaccine
+}
+
+// ------------------------------------------
+// RELACIONES
+// ------------------------------------------
+
+Ref: Veterinarian.vet_id - App_user.vet_id [delete: set null]
+Ref: Speciality.speciality_id < Veterinarian.speciality_id [delete: restrict]
+Ref: Customer.customer_id < Pet.customer_id [delete: restrict]
+Ref: Breed.breed_id < Pet.breed_id [delete: restrict]
+Ref: Pet.pet_id < Pet_allergy.pet_id [delete: cascade]
+Ref: Pet.pet_id - Medical_record.pet_id [delete: restrict]
+Ref: Pet.pet_id < Appointment.pet_id [delete: restrict]
+Ref: Veterinarian.vet_id < Appointment.vet_id [delete: restrict]
+Ref: Medical_record.medical_record_id < Consultation.medical_record_id [delete: restrict]
+Ref: Appointment.appointment_id - Consultation.appointment_id [delete: set null]
+Ref: Veterinarian.vet_id < Consultation.vet_id [delete: restrict]
+Ref: Consultation.consultation_id < Treatment.consultation_id [delete: restrict]
+Ref: Medication.medication_id < Treatment.medication_id [delete: restrict]
+Ref: Consultation.consultation_id < Vaccination.consultation_id [delete: restrict]
+Ref: Vaccine.vaccine_id < Vaccination.vaccine_id [delete: restrict]
