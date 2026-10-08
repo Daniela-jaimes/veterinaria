@@ -80,11 +80,6 @@ import { AuthService } from '../../core/services/auth.service';
 
         </form>
 
-        <!-- Credenciales de prueba -->
-        <small>
-          Prueba: admin / Admin123!
-        </small>
-
       </div>
 
     </div>
@@ -96,11 +91,11 @@ export class LoginComponent {
   auth = inject(AuthService);
   router = inject(Router);
 
-  // Datos del formulario
+  // Datos
   username = '';
   password = '';
 
-  // Estado de la petición
+  // Estado
   loading = false;
 
   // Mensaje de error

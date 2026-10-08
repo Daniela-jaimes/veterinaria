@@ -37,11 +37,25 @@ class AppointmentService(BaseService):
         if not vet.is_active:
             raise BadRequestError("El veterinario está inactivo")
 
+    @staticmethod
+    def _validate_schedule(scheduled_at: datetime) -> None:
+        if scheduled_at.weekday() > 4:
+            raise BadRequestError("Solo se pueden agendar citas de lunes a viernes")
+
+        minutes = scheduled_at.hour * 60 + scheduled_at.minute
+        is_morning = 7 * 60 <= minutes <= 12 * 60
+        is_afternoon = 14 * 60 <= minutes <= 17 * 60
+        if not (is_morning or is_afternoon):
+            raise BadRequestError(
+                "El horario de atención para citas es de lunes a viernes de 7:00 a 12:00 y de 14:00 a 17:00"
+            )
+
     async def _ensure_free_slot(self, vet_id: int, start: datetime, minutes: int, exclude_id: int | None = None):
         if await self.repo.has_overlap(vet_id, start, minutes, exclude_id):
             raise ConflictError("El veterinario ya tiene una cita en ese horario")
 
     async def create(self, payload: AppointmentCreate) -> Appointment:
+        self._validate_schedule(payload.scheduled_at)
         await self._validate_refs(payload.pet_id, payload.vet_id)
         await self._ensure_free_slot(payload.vet_id, payload.scheduled_at, payload.duration_minutes)
         async with self._guard("No se pudo crear la cita"):
@@ -75,6 +89,8 @@ class AppointmentService(BaseService):
             vet_id = changes.get("vet_id", obj.vet_id)
             start = changes.get("scheduled_at", obj.scheduled_at)
             minutes = changes.get("duration_minutes", obj.duration_minutes)
+            if "scheduled_at" in changes:
+                self._validate_schedule(start)
             await self._validate_refs(pet_id, vet_id)
             await self._ensure_free_slot(vet_id, start, minutes, exclude_id=appointment_id)
 

@@ -84,24 +84,6 @@ import { ApiService } from '../../core/services/api.service';
 
     </div>
 
-    <!-- Información de arquitectura -->
-    <div class="panel">
-
-      <h3>
-        Arquitectura
-      </h3>
-
-      <p>
-        Angular consume la API FastAPI mediante servicios HTTP.
-        El interceptor agrega automáticamente
-        <code>
-          Authorization: Bearer &lt;token&gt;
-        </code>
-        a las peticiones autenticadas y redirige al login
-        ante un 401.
-      </p>
-
-    </div>
   `
 })
 export class DashboardComponent {
