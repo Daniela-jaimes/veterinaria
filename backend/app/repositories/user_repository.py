@@ -23,7 +23,7 @@ class UserRepository(BaseRepository[AppUser]):
             pattern = f"%{search}%"
             where.append(AppUser.username.ilike(pattern) | AppUser.email.ilike(pattern))
         return await self.get_page(
-            where=where, order_by=[AppUser.username], limit=limit, offset=offset, options=self.DETAIL
+            where=where, order_by=[], limit=limit, offset=offset, options=self.DETAIL
         )
 
     async def get_by_username(self, username: str, exclude_id: int | None = None) -> AppUser | None:

@@ -23,17 +23,19 @@ class PetCreate(InputModel):
     birth_date: BirthDate | None = None
     sex: PetSex = PetSex.unknown
     microchip_number: str | None = Field(None, min_length=1, max_length=20)
+    photo_url: str | None = Field(None, min_length=1, max_length=500)
     is_neutered: bool = False
 
 
 class PetUpdate(UpdateModel):
-    nullable_fields: ClassVar[frozenset[str]] = frozenset({"birth_date", "microchip_number"})
+    nullable_fields: ClassVar[frozenset[str]] = frozenset({"birth_date", "microchip_number", "photo_url"})
     customer_id: IdInt | None = None
     breed_id: IdInt | None = None
     name: str | None = Field(None, min_length=1, max_length=50)
     birth_date: BirthDate | None = None
     sex: PetSex | None = None
     microchip_number: str | None = Field(None, min_length=1, max_length=20)
+    photo_url: str | None = Field(None, min_length=1, max_length=500)
     is_neutered: bool | None = None
     is_active: bool | None = None
 
@@ -52,5 +54,6 @@ class PetResponse(ORMModel):
     birth_date: date | None
     sex: PetSex
     microchip_number: str | None
+    photo_url: str | None = None
     is_neutered: bool
     is_active: bool

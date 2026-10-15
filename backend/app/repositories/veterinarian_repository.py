@@ -28,7 +28,7 @@ class VeterinarianRepository(BaseRepository[Veterinarian]):
                 )
             )
         return await self.get_page(
-            where=where, order_by=[Veterinarian.last_name, Veterinarian.first_name],
+            where=where, order_by=[],
             limit=limit, offset=offset, options=self.DETAIL,
         )
 

@@ -34,9 +34,9 @@ class PetService(BaseService):
             await self.session.commit()
         return await self.get(obj.pet_id)
 
-    async def list(self, *, customer_id, breed_id, is_active, search, limit: int, offset: int):
+    async def list(self, *, customer_id, breed_id, is_active, search, limit: int, offset: int, species=None):
         return await self.repo.search(
-            customer_id=customer_id, breed_id=breed_id, is_active=is_active, search=search,
+            customer_id=customer_id, breed_id=breed_id, is_active=is_active, species=species, search=search,
             limit=limit, offset=offset,
         )
 

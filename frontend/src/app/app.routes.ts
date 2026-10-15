@@ -118,14 +118,8 @@ export const routes: Routes = [
       {
         path: 'veterinarians',
         loadComponent: () =>
-          import('./pages/resource-list/resource-list.component')
-            .then(m => m.ResourceListComponent),
-
-        data: {
-          resource: 'veterinarians',
-          title: 'Veterinarios',
-          idField: 'vet_id'
-        }
+          import('./pages/veterinarians/veterinarians.component')
+            .then(m => m.VeterinariansComponent)
       },
 
       // =================================================

@@ -1,11 +1,4 @@
-"""Carga datos de ejemplo en la BD para probar la API.
 
-Uso (desde la carpeta backend/, con el venv activo):
-    python seed.py
-
-Es idempotente: busca cada registro por su clave única antes de insertarlo,
-así que se puede ejecutar varias veces sin duplicar datos.
-"""
 import asyncio
 from datetime import date, datetime, timedelta
 from decimal import Decimal
@@ -103,7 +96,7 @@ async def seed() -> None:
         )
 
         # --- Razas -------------------------------------------------------------------------
-        labrador = await get_or_create(s, Breed, {"species": PetSpecies.dog, "name": "Labrador"})
+        labrador = await get_or_create(s, Breed, {"species": PetSpecies.dog, "name": "Labrador Retriever"})
         criollo = await get_or_create(s, Breed, {"species": PetSpecies.dog, "name": "Criollo"})
         poodle = await get_or_create(s, Breed, {"species": PetSpecies.dog, "name": "Poodle"})
         siames = await get_or_create(s, Breed, {"species": PetSpecies.cat, "name": "Siamés"})
@@ -142,6 +135,18 @@ async def seed() -> None:
             {"customer_id": c3.customer_id, "breed_id": canario.breed_id, "name": "Piolín",
              "birth_date": date(2024, 2, 2), "sex": PetSex.unknown},
         )
+
+        # --- Fotos de mascotas (frontend/public/images/animals) ----------------------------
+        photos = {
+            rocky: "dog_labrador_1.jpg",
+            luna: "cat_siame_2.jpg",
+            toby: "dog_criollo_1.jpg",
+            mia: "cat_mestizo_1.jpg",
+            coco: "dog_poodle_1.jpg",
+        }
+        for pet, filename in photos.items():
+            pet.photo_url = f"/images/animals/{filename}"
+        await s.flush()
 
         # --- Alergias e historias clínicas -------------------------------------------------
         await get_or_create(s, PetAllergy, {"pet_id": rocky.pet_id, "description": "Alergia a la penicilina"})

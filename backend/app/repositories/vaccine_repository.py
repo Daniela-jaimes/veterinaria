@@ -14,7 +14,7 @@ class VaccineRepository(BaseRepository[Vaccine]):
             where.append(Vaccine.name.ilike(f"%{name}%"))
         if manufacturer:
             where.append(Vaccine.manufacturer.ilike(f"%{manufacturer}%"))
-        return await self.get_page(where=where, order_by=[Vaccine.name], limit=limit, offset=offset)
+        return await self.get_page(where=where, order_by=[], limit=limit, offset=offset)
 
     async def get_duplicate(self, name: str, manufacturer: str | None, exclude_id: int | None = None) -> Vaccine | None:
         # En Postgres UNIQUE(name, manufacturer) no detecta duplicados con manufacturer NULL:

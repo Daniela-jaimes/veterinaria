@@ -2,6 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query, status
 
+from app.models.enums import PetSpecies
 from app.routers.deps import IdPath, PaginationDep, SessionDep
 from app.schemas.common import Page
 from app.schemas.pet import PetCreate, PetResponse, PetUpdate
@@ -30,11 +31,12 @@ async def list_pets(
     customer_id: int | None = Query(None, ge=1, description="Filtra por dueño"),
     breed_id: int | None = Query(None, ge=1, description="Filtra por raza"),
     is_active: bool | None = Query(None, description="Filtra por estado"),
+    species: PetSpecies | None = Query(None, description="Filtra por especie de la raza"),
     search: str | None = Query(None, description="Búsqueda parcial por nombre"),
 ):
     """Lista mascotas con paginación y filtros."""
     items, total = await service.list(
-        customer_id=customer_id, breed_id=breed_id, is_active=is_active, search=search,
+        customer_id=customer_id, breed_id=breed_id, is_active=is_active, species=species, search=search,
         limit=pagination.limit, offset=pagination.offset,
     )
     return pagination.wrap(items, total)

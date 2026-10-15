@@ -12,7 +12,7 @@ class SpecialityRepository(BaseRepository[Speciality]):
         where = []
         if name:
             where.append(Speciality.name.ilike(f"%{name}%"))
-        return await self.get_page(where=where, order_by=[Speciality.name], limit=limit, offset=offset)
+        return await self.get_page(where=where, order_by=[], limit=limit, offset=offset)
 
     async def get_by_name(self, name: str, exclude_id: int | None = None) -> Speciality | None:
         conds = [func.lower(Speciality.name) == name.lower()]

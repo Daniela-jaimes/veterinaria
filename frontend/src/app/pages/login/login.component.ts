@@ -83,7 +83,30 @@ import { AuthService } from '../../core/services/auth.service';
       </div>
 
     </div>
-  `
+  `,
+  styles: [`
+    .login-page {
+      background:
+        linear-gradient(90deg, #e0f2fe00 40%, #f0f9ffcc 100%),
+        url('/images/login-bg.jpg') left center / 80% auto no-repeat,
+        #bcd9e7;
+        justify-items: end;
+      padding: 0 8vw;
+    }
+
+    .login-card {
+      background: #ffffffeb;
+      backdrop-filter: blur(8px);
+      border: 1px solid #ffffff99;
+    }
+
+    @media (max-width: 850px) {
+      .login-page {
+        justify-items: center;
+        padding: 0 16px;
+      }
+    }
+  `]
 })
 export class LoginComponent {
 

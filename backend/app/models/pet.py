@@ -1,3 +1,4 @@
+
 from datetime import date
 
 from sqlalchemy import Boolean, Date, ForeignKey, Integer, String, text
@@ -12,16 +13,38 @@ class Pet(Base):
 
     pet_id: Mapped[int] = mapped_column(Integer, primary_key=True)
     customer_id: Mapped[int] = mapped_column(
-        ForeignKey("customer.customer_id", ondelete="RESTRICT"), nullable=False
+        ForeignKey("customer.customer_id", ondelete="RESTRICT"),
+        nullable=False,
     )
     breed_id: Mapped[int] = mapped_column(
-        ForeignKey("breed.breed_id", ondelete="RESTRICT"), nullable=False
+        ForeignKey("breed.breed_id", ondelete="RESTRICT"),
+        nullable=False,
     )
     name: Mapped[str] = mapped_column(String(50), nullable=False)
+    photo_url: Mapped[str | None] = mapped_column(
+        String(500),
+        nullable=True,   
+    )
     birth_date: Mapped[date | None] = mapped_column(Date)
     sex: Mapped[PetSex] = mapped_column(
-        pg_enum(PetSex, "pet_sex"), nullable=False, server_default=text("'unknown'")
+        pg_enum(PetSex, "pet_sex"),
+        nullable=False,
+        server_default=text("'unknown'"),
     )
-    microchip_number: Mapped[str | None] = mapped_column(String(20), unique=True)
-    is_neutered: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("false"))
-    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("true"))
+
+    microchip_number: Mapped[str | None] = mapped_column(
+        String(20),
+        unique=True,
+    )
+
+    is_neutered: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        server_default=text("false"),
+    )
+
+    is_active: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        server_default=text("true"),
+    )

@@ -23,7 +23,7 @@ class CustomerRepository(BaseRepository[Customer]):
                 )
             )
         return await self.get_page(
-            where=where, order_by=[Customer.last_name, Customer.first_name], limit=limit, offset=offset
+            where=where, order_by=[], limit=limit, offset=offset
         )
 
     async def get_by_email(self, email: str, exclude_id: int | None = None) -> Customer | None:

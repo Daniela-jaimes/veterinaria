@@ -15,7 +15,7 @@ class BreedRepository(BaseRepository[Breed]):
             where.append(Breed.species == species)
         if name:
             where.append(Breed.name.ilike(f"%{name}%"))
-        return await self.get_page(where=where, order_by=[Breed.species, Breed.name], limit=limit, offset=offset)
+        return await self.get_page(where=where, order_by=[], limit=limit, offset=offset)
 
     async def get_duplicate(self, species: PetSpecies, name: str, exclude_id: int | None = None) -> Breed | None:
         conds = [Breed.species == species, func.lower(Breed.name) == name.lower()]

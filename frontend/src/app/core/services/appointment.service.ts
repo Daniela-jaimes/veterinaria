@@ -1,29 +1,28 @@
-import {
-    Injectable,inject
-} 
-from '@angular/core'; 
-import {
-    ApiService
-} 
-from './api.service'; 
-import {
-    Appointment
-} 
-from '../models/entities.models';
-@Injectable({
-    providedIn:'root'
-}) export class AppointmentService {
-    private api=inject(ApiService); 
-    list(page:number,limit:number){return this.api.list<Appointment>('appointments',page,limit);
+import { Injectable, inject } from '@angular/core';
 
-    } 
-    create(p:Partial<Appointment>){
-        return this.api.create<Appointment>('appointments',p)
-    } 
-    update(id:number,p:Partial<Appointment>){
-        return this.api.update<Appointment>('appointments',id,p)
-    } 
-    remove(id:number){
-        return this.api.remove('appointments',id)
-    } 
+import { Appointment } from '../models/entities.models';
+import { ApiService } from './api.service';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AppointmentService {
+  private api = inject(ApiService);
+  private readonly resource = 'appointments';
+
+  list(page: number, limit: number) {
+    return this.api.list<Appointment>(this.resource, page, limit);
+  }
+
+  create(payload: Partial<Appointment>) {
+    return this.api.create<Appointment>(this.resource, payload);
+  }
+
+  update(id: number, payload: Partial<Appointment>) {
+    return this.api.update<Appointment>(this.resource, id, payload);
+  }
+
+  remove(id: number) {
+    return this.api.remove(this.resource, id);
+  }
 }

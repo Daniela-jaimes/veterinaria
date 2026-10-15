@@ -1,30 +1,28 @@
-import {
-    Injectable,inject
-} 
-from '@angular/core'; 
-import {
-    ApiService
-} 
-from './api.service'; 
-import {
-    Customer
-}
-from '../models/entities.models';
+import { Injectable, inject } from '@angular/core';
+
+import { Customer } from '../models/entities.models';
+import { ApiService } from './api.service';
+
 @Injectable({
-    providedIn:'root'
-}) 
+  providedIn: 'root'
+})
 export class CustomerService {
-    private api=inject(ApiService);
-    list(page:number,limit:number,search='')
-    {
-    return this.api.list<Customer>('customers',page,limit,{search});
-    } 
-    create(p:Partial<Customer>){
-        return this.api.create<Customer>('customers',p)
-    } 
-    update(id:number,p:Partial<Customer>){
-        return this.api.update<Customer>('customers',id,p)
-    }
-    remove(id:number){
-        return this.api.remove('customers',id)} 
-    }
+  private api = inject(ApiService);
+  private readonly resource = 'customers';
+
+  list(page: number, limit: number, search = '') {
+    return this.api.list<Customer>(this.resource, page, limit, { search });
+  }
+
+  create(payload: Partial<Customer>) {
+    return this.api.create<Customer>(this.resource, payload);
+  }
+
+  update(id: number, payload: Partial<Customer>) {
+    return this.api.update<Customer>(this.resource, id, payload);
+  }
+
+  remove(id: number) {
+    return this.api.remove(this.resource, id);
+  }
+}

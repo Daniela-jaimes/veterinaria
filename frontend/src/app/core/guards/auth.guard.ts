@@ -1,12 +1,20 @@
-import {CanActivateFn,Router} 
-from '@angular/router'; 
-import {inject} 
-from '@angular/core'; 
-import {AuthService} 
-from '../services/auth.service';
-export const authGuard:CanActivateFn=()=>{
-    const a=inject(AuthService);return a.isLoggedIn()||inject(Router).createUrlTree(['/login']);
+import { inject } from '@angular/core';
+import { CanActivateFn, Router } from '@angular/router';
+
+import { AuthService } from '../services/auth.service';
+
+/** Exige sesión iniciada; si no, redirige a /login. */
+export const authGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+
+  return auth.isLoggedIn() || router.createUrlTree(['/login']);
 };
-export const adminGuard:CanActivateFn=()=>{
-    const a=inject(AuthService);return a.user()?.role==='admin'||inject(Router).createUrlTree(['/']);
+
+/** Exige rol admin; si no, redirige al inicio. */
+export const adminGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+
+  return auth.user()?.role === 'admin' || router.createUrlTree(['/']);
 };

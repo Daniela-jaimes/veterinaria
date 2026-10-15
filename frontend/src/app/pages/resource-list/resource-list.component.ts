@@ -1,7 +1,10 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { ApiService } from '../../core/services/api.service';
+
+type Row = Record<string, unknown>;
 
 @Component({
   standalone: true,
@@ -53,6 +56,10 @@ import { ApiService } from '../../core/services/api.service';
 
             }
 
+            <th>
+              Acciones
+            </th>
+
           </tr>
 
         </thead>
@@ -71,6 +78,15 @@ import { ApiService } from '../../core/services/api.service';
 
               }
 
+              <td>
+                <button
+                  type="button"
+                  class="danger"
+                  (click)="remove(item)">
+                  Eliminar
+                </button>
+              </td>
+
             </tr>
 
           }
@@ -79,7 +95,7 @@ import { ApiService } from '../../core/services/api.service';
 
             <tr>
 
-              <td [attr.colspan]="columns.length">
+              <td [attr.colspan]="columns.length + 1">
                 No hay registros.
               </td>
 
@@ -129,7 +145,7 @@ export class ResourceListComponent {
   idField = 'id';
 
   // Datos
-  items: any[] = [];
+  items: Row[] = [];
   columns: string[] = [];
 
   // Paginación
@@ -159,7 +175,7 @@ export class ResourceListComponent {
     this.page = page;
 
     this.api
-      .list<any>(
+      .list<Row>(
         this.resource,
         page,
         this.limit
@@ -189,7 +205,7 @@ export class ResourceListComponent {
 
         },
 
-        error: (error) => {
+        error: (error: HttpErrorResponse) => {
 
           this.error =
             error.error?.detail ||
@@ -201,10 +217,48 @@ export class ResourceListComponent {
   }
 
   /**
+   * Eliminar un registro
+   */
+  remove(item: Row) {
+
+    const id = item[this.idField] as number;
+
+    if (!confirm(`¿Eliminar el registro #${id} de ${this.title}?`)) {
+      return;
+    }
+
+    this.api
+      .remove(this.resource, id)
+      .subscribe({
+
+        next: () => {
+
+          // Si se vacía la página actual, volver a la anterior
+          const page =
+            this.items.length === 1 && this.page > 1
+              ? this.page - 1
+              : this.page;
+
+          this.load(page);
+
+        },
+
+        error: (error: HttpErrorResponse) => {
+
+          this.error =
+            error.error?.detail ||
+            'No se pudo eliminar el registro.';
+
+        }
+
+      });
+  }
+
+  /**
    * Formatear valores para mostrarlos
    * correctamente en la tabla.
    */
-  format(value: any): string {
+  format(value: unknown): string {
 
     if (
       value === null ||
@@ -216,6 +270,25 @@ export class ResourceListComponent {
     if (
       typeof value === 'object'
     ) {
+
+      const obj = value as Record<string, unknown>;
+
+      // Nombre completo (clientes, veterinarios, usuarios)
+      if (obj['first_name'] || obj['last_name']) {
+        return `${obj['first_name'] ?? ''} ${obj['last_name'] ?? ''}`.trim();
+      }
+
+      // Mascota, medicamento, vacuna, raza, etc.
+      const label =
+        obj['name'] ??
+        obj['username'] ??
+        obj['description'] ??
+        obj['title'];
+
+      if (label) {
+        return String(label);
+      }
+
       return JSON.stringify(value);
     }
 
